@@ -1,5 +1,4 @@
 require 'discordrb'
-require 'pry'
 
 TOKEN = ENV['DISCORD_API_TOKEN']
 SERVER_ID = 478810581273673746
