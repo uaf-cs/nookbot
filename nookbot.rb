@@ -78,13 +78,13 @@ discord.command(:dropclass, description: 'Removes you from a class chat', usage:
   end
 end
 
-discord.command(:roll,description: 'Performs a dice roll', usage: 'roll 20') do |event, dice|
+discord.command(:roll, description: 'Performs a dice roll', usage: 'roll 20') do |event, dice|
   highest_number = Integer(dice) rescue nil
   if highest_number
-  return rand(1..highest_number)
+    return rand(1..highest_number)
   else
-    return 'Proper usage is !roll 20 '
-    end
+    return 'Proper usage is !roll 20'
+   end
 end
 
 discord.command(:cat, description: "Gives random cat", usage: 'cat') do |event|
