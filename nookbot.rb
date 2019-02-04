@@ -105,4 +105,8 @@ discord.command(:classes, description: 'Lists classes', usage: 'classes') do |ev
   return message
 end
 
+discord.command(:source, description: 'Tells you where to find the source code', usage: 'source') do |event|
+  "https://github.com/FineTralfazz/NookBot"
+end
+
 discord.sync
