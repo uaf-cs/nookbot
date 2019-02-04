@@ -21,8 +21,9 @@ def is_admin_or_teacher(user)
 end
 
 
-discord.command(:createclass, description: 'Creates a new class chat', usage: 'createclass cs123') do |event, class_id|
+discord.command(:createclass, description: 'Creates a new class chat', usage: 'createclass cs123') do |event, class_id_raw|
   if is_admin_or_teacher event.user
+    class_id = class_id_raw.downcase.chomp
     class_role = server.create_role name: "class-#{ class_id }"
     everyone_role = server.roles.find { |r| r.name == '@everyone' }
 
@@ -40,8 +41,9 @@ discord.command(:createclass, description: 'Creates a new class chat', usage: 'c
 end
 
 
-discord.command(:destroyclass, description: 'Destroys an existing class chat', usage: 'destroyclass cs123') do |event, class_id|
+discord.command(:destroyclass, description: 'Destroys an existing class chat', usage: 'destroyclass cs123') do |event, class_id_raw|
   if is_admin_or_teacher event.user
+    class_id = class_id_raw.downcase.chomp
     channel = server.channels.find { |r| r.name == class_id }
     if channel.parent_id != CLASS_CATEGORY_ID
       return "Not a valid class chat"
@@ -55,9 +57,10 @@ discord.command(:destroyclass, description: 'Destroys an existing class chat', u
 end
 
 
-discord.command(:joinclass, description: 'Adds you to a class chat', usage: 'joinclass cs123') do |event, class_id|
+discord.command(:joinclass, description: 'Adds you to a class chat', usage: 'joinclass cs123') do |event, class_id_raw|
+  class_id = class_id_raw.downcase.chomp
   class_channel_names = server.channels.select { |c| c.parent_id == CLASS_CATEGORY_ID }.map {|c| c.name}
-  if class_channel_names.include? class_id.downcase.chomp
+  if class_channel_names.include? class_id
     role = server.roles.select { |r| r.name == "class-#{ class_id }" }
     event.user.modify_roles(role, [], nil)
     return 'Done'
@@ -67,9 +70,10 @@ discord.command(:joinclass, description: 'Adds you to a class chat', usage: 'joi
 end
 
 
-discord.command(:dropclass, description: 'Removes you from a class chat', usage: 'dropclass cs123') do |event, class_id|
+discord.command(:dropclass, description: 'Removes you from a class chat', usage: 'dropclass cs123') do |event, class_id_raw|
+  class_id = class_id_raw.downcase.chomp
   class_channel_names = server.channels.select { |c| c.parent_id == CLASS_CATEGORY_ID }.map {|c| c.name}
-  if class_channel_names.include? class_id.downcase.chomp
+  if class_channel_names.include? class_id
     role = server.roles.select { |r| r.name == "class-#{ class_id }" }
     event.user.modify_roles([], role, nil)
     return 'Done'
