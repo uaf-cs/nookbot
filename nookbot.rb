@@ -1,5 +1,6 @@
 require 'discordrb'
-
+require 'net/https'
+require 'json'
 TOKEN = ENV['DISCORD_API_TOKEN']
 SERVER_ID = 478810581273673746
 CLASS_CATEGORY_ID = 478815208035581978
@@ -74,6 +75,25 @@ discord.command(:dropclass, description: 'Removes you from a class chat', usage:
     return 'Done'
   else
     return 'Invalid class id'
+  end
+end
+
+discord.command(:roll,description: 'Performs a dice roll', usage: 'roll 20') do |event, dice|
+  highest_number = Integer(dice) rescue nil
+  if highest_number
+  return rand(1..highest_number)
+  else
+    return 'Proper usage is !roll 20 '
+    end
+end
+
+discord.command(:cat, description: "Gives random cat", usage: 'cat') do |event|
+  url = 'https://aws.random.cat/meow'
+  uri = URI(url)
+  response = Net::HTTP.get(uri)
+  random_kitty = JSON.parse(response)["file"]
+  event.channel.send_embed do |embed|
+   embed.image = Discordrb::Webhooks::EmbedImage.new(url: random_kitty)
   end
 end
 
