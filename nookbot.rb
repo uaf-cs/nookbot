@@ -113,4 +113,5 @@ discord.command(:source, description: 'Tells you where to find the source code',
   "https://github.com/FineTralfazz/NookBot"
 end
 
+discord.listening = '!help'
 discord.sync
