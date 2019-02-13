@@ -119,19 +119,6 @@ discord.command(:hotdog,description: "Gives a hotdog", usage: 'hotdog') do |even
   end
 end
 
-discord.command(:insult,description: "Insults a user", usage: "insult @user") do |event, target|
-  url = 'https://evilinsult.com/generate_insult.php?lang=en&type=json'
-  uri = URI(url)
-  response = Net::HTTP.get(uri)
-  insult = JSON.parse(response)["insult"]
-  if target.nil?
-    event.channel.send_message(event.author.mention + ' ' + insult)
-  else
-    event.channel.send_message(target + ' ' +  insult)
-  end
-
-end
-
 discord.member_join do|event|
   event.user.pm.send_embed do |embed|
     embed.title = "Welcome to the UAF CS Discord! Here's some important info to get you started on the server."
