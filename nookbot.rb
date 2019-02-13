@@ -113,5 +113,37 @@ discord.command(:source, description: 'Tells you where to find the source code',
   "https://github.com/FineTralfazz/NookBot"
 end
 
+discord.command(:hotdog,description: "Gives a hotdog", usage: 'hotdog') do |event|
+  event.channel.send_embed do |embed|
+    embed.image = Discordrb::Webhooks::EmbedImage.new(url: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Hotdog_-_Evan_Swigart.jpg/1200px-Hotdog_-_Evan_Swigart.jpg")
+  end
+end
+
+discord.command(:insult,description: "Insults a user", usage: "insult @user") do |event, target|
+  url = 'https://evilinsult.com/generate_insult.php?lang=en&type=json'
+  uri = URI(url)
+  response = Net::HTTP.get(uri)
+  insult = JSON.parse(response)["insult"]
+  if target.nil?
+    event.channel.send_message(event.author.mention + ' ' + insult)
+  else
+    event.channel.send_message(target + ' ' +  insult)
+  end
+
+end
+
+discord.member_join do|event|
+  event.user.pm.send_embed do |embed|
+    embed.title = "Welcome to the UAF CS Discord! Here's some important info to get you started on the server."
+    embed.colour = 0x38a4f4
+
+
+    embed.add_field(name: "📛", value: "First thing's first, we need to know who you are! Message one of the admins(the people in yellow on the right when you're in the server) and tell them who you are")
+    embed.add_field(name: "🏷️", value: "Next you need to set your name! If you're on a computer right clicking yourself while in the server and selecting 'change nickname' will let you set your name for the server")
+    embed.add_field(name: "📚", value: "Lastly, you can join specific class chats with the help of our resident NookBot. You can type the !classes command to see available classes and !joinclass (class-name) to join that class. Make sure you do all NookBot commands within the 'NookBot Den' channel.")
+    embed.add_field(name: "P.S.",value: "For all other rules ask an admin or see the server-rules channel")
+  end
+end
+
 discord.listening = '!help'
 discord.sync
