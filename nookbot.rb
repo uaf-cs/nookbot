@@ -103,6 +103,15 @@ discord.command(:cat, description: "Gives random cat", usage: 'cat') do |event|
   end
 end
 
+discord.command(:dog, description: "Gives random dog", usage: 'dog') do |event|
+  url = 'https://dog.ceo/api/breeds/image/random'
+  uri = URI(url)
+  response = Net::HTTP.get(uri)
+  random_doggy = JSON.parse(response)["message"]
+  event.channel.send_embed do |embed|
+   embed.image = Discordrb::Webhooks::EmbedImage.new(url: random_doggy)
+  end
+end
 
 discord.command(:classes, description: 'Lists classes', usage: 'classes') do |event|
   message = "Currently available class channels:\n"
