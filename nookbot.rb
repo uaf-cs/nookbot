@@ -113,6 +113,14 @@ discord.command(:dog, description: "Gives random dog", usage: 'dog') do |event|
   end
 end
 
+discord.command(:fact, description: "Gives random fact", usage: 'fact') do |event|
+  url = 'http://randomuselessfact.appspot.com/random.json?language=en'
+  uri = URI(url)
+  response = Net::HTTP.get(uri)
+  random_fact = JSON.parse(response)["text"]
+  return random_fact
+end
+
 discord.command(:classes, description: 'Lists classes', usage: 'classes') do |event|
   message = "Currently available class channels:\n"
   server.channels.select { |c| c.parent_id == CLASS_CATEGORY_ID }.each do |c|
