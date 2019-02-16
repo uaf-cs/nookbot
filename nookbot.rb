@@ -2,14 +2,12 @@ require 'discordrb'
 require 'net/https'
 require 'json'
 
-TOKEN = ENV['DISCORD_API_TOKEN']
-SERVER_ID = 478810581273673746
-CLASS_CATEGORY_ID = 478815208035581978
-
-discord = Discordrb::Commands::CommandBot.new token: TOKEN, prefix: '!'
+config = json.parse(File.read('config.json'))
+discord = Discordrb::Commands::CommandBot.new token: config['api_token'],
+                                              prefix: '!'
 discord.run :async
 
-server = discord.servers[SERVER_ID]
+server = discord.servers[config['server_id']]
 
 def admin_or_teacher?(user)
   user.roles.each do |role|
@@ -37,7 +35,7 @@ discord.command(:createclass,
     server.create_channel class_id, 0, permission_overwrites: [
       class_role_overwrite,
       everyone_role_overwrite
-    ], parent: CLASS_CATEGORY_ID
+    ], parent: config['class_category_id']
     'Channel created'
   else
     "You don't have permission to use this command."
@@ -52,7 +50,8 @@ discord.command(:destroyclass,
 
   class_id = class_id_raw.downcase.chomp
   channel = server.channels.find { |r| r.name == class_id }
-  return 'Not a valid class chat' if channel.parent_id != CLASS_CATEGORY_ID
+  class_category_id = config['class_category_id']
+  return 'Not a valid class chat' if channel.parent_id != class_category_id
 
   channel.delete
   server.roles.find { |r| r.name == "class-#{class_id}" }.delete
@@ -63,8 +62,9 @@ discord.command(:joinclass,
                 description: 'Adds you to a class chat',
                 usage: 'joinclass cs123') do |event, class_id_raw|
   class_id = class_id_raw.downcase.chomp
+  class_category_id = config['class_category_id']
   class_channel_names = server.channels
-                              .select { |c| c.parent_id == CLASS_CATEGORY_ID }
+                              .select { |c| c.parent_id == class_category_id }
                               .map(&:name)
   return 'Invalid class id' unless class_channel_names.include? class_id
 
@@ -77,8 +77,9 @@ discord.command(:dropclass,
                 description: 'Removes you from a class chat',
                 usage: 'dropclass cs123') do |event, class_id_raw|
   class_id = class_id_raw.downcase.chomp
+  class_category_id = config['class_category_id']
   class_channel_names = server.channels
-                              .select { |c| c.parent_id == CLASS_CATEGORY_ID }
+                              .select { |c| c.parent_id == class_category_id }
                               .map(&:name)
   return 'Invalid class id' unless class_channel_names.include? class_id
 
@@ -89,7 +90,8 @@ end
 
 discord.command(:classes, description: 'Lists classes', usage: 'classes') do
   message = "Currently available class channels:\n"
-  server.channels.select { |c| c.parent_id == CLASS_CATEGORY_ID }.each do |c|
+  class_category_id = config['class_category_id']
+  server.channels.select { |c| c.parent_id == class_category_id }.each do |c|
     message << "* #{c.name}\n"
   end
   return message
