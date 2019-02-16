@@ -1,5 +1,5 @@
-# NookBot
 [![Build Status](https://travis-ci.org/FineTralfazz/NookBot.svg?branch=master)](https://travis-ci.org/FineTralfazz/NookBot)
+# NookBot
 This bot is designed to manage the UAF Computer Science Discord server (primarily by adding people to class-specific roles).
 
 ## Running
