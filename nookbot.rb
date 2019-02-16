@@ -2,7 +2,7 @@ require 'discordrb'
 require 'net/https'
 require 'json'
 
-config = json.parse(File.read('config.json'))
+config = JSON.parse(File.read('config.json'))
 discord = Discordrb::Commands::CommandBot.new token: config['api_token'],
                                               prefix: '!'
 discord.run :async
