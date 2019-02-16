@@ -1,4 +1,5 @@
 # NookBot
+[![Build Status](https://travis-ci.org/FineTralfazz/NookBot.svg?branch=master)](https://travis-ci.org/FineTralfazz/NookBot)
 This bot is designed to manage the UAF Computer Science Discord server (primarily by adding people to class-specific roles).
 
 ## Running
@@ -10,4 +11,4 @@ ruby nookbot.rb
 ```
 
 ## Contributing
-I don't have strong formatting requirements, just try to match the existing style and Ruby conventions.
+Code should be checked with Rubocop prior to commit.
