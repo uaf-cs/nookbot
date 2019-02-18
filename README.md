@@ -4,9 +4,10 @@ This bot is designed to manage the UAF Computer Science Discord server (primaril
 
 ## Running
 (Assuming you have a working Ruby installation already)
+
+Copy `config.json.example` to `config.json` and update it with your dev server's information.
 ```
 bundle
-export DISCORD_API_TOKEN=your_api_token_here
 ruby nookbot.rb
 ```
 
