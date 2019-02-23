@@ -32,6 +32,8 @@ discord.command(:createclass,
 
     read_messages = Discordrb::Permissions.new
     read_messages.can_read_messages = true
+    read_messages.can_send_messages = true
+    read_messages.can_read_message_history = true
 
     class_role_overwrite = Discordrb::Overwrite.new class_role,
                                                     allow: read_messages
