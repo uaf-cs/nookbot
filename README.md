@@ -13,3 +13,5 @@ ruby nookbot.rb
 
 ## Contributing
 Code should be checked with Rubocop prior to commit.
+
+[Past contributors](https://github.com/FineTralfazz/NookBot/graphs/contributors)
