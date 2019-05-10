@@ -16,12 +16,21 @@ discord = Discordrb::Commands::CommandBot.new token: config['api_token'],
                                               prefix: '!'
 
 discord.ready do
-  discord.servers[config['server_id']].users.each do |user|
+  server = discord.servers[config['server_id']]
+  server.users.each do |user|
     user.roles.each do |role|
       if role.name.start_with? 'class-'
         puts "Removing #{role.name} from #{user.name}"
         user.remove_role role
       end
+    end
+  end
+  server.channels.each do |channel|
+    next unless channel.parent_id == config['class_category_id']
+
+    while channel.history(1).count != 0
+      puts "Pruning from #{channel.name}..."
+      channel.prune 100
     end
   end
   exit
