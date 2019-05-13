@@ -81,7 +81,7 @@ discord.command(:joinclass,
     roles.push(server.roles.find { |r| r.name == "class-#{class_id}" })
   end
   event.user.modify_roles(roles, [], nil)
-  return 'done'
+  return 'Done'
 end
 
 discord.command(:dropclass,
@@ -99,7 +99,7 @@ discord.command(:dropclass,
     roles.push(server.roles.find { |r| r.name == "class-#{class_id}" })
   end
   event.user.modify_roles([], roles, nil)
-  return 'done'
+  return 'Done'
 end
 
 discord.command(:classes, description: 'Lists classes', usage: 'classes') do
