@@ -28,9 +28,20 @@ discord.ready do
   server.channels.each do |channel|
     next unless channel.parent_id == config['class_category_id']
 
+    hit_age_limit = false
     while channel.history(1).count != 0
       puts "Pruning from #{channel.name}..."
-      channel.prune 100
+      begin
+        if hit_age_limit
+          channel.history(100).each do |message|
+            message.delete
+          end
+        else
+          channel.prune 100, strict: true
+        end
+      rescue ArgumentError
+        hit_age_limit = true
+      end
     end
   end
   exit
