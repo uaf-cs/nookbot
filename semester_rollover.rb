@@ -33,9 +33,7 @@ discord.ready do
       puts "Pruning from #{channel.name}..."
       begin
         if hit_age_limit
-          channel.history(100).each do |message|
-            message.delete
-          end
+          channel.history(100).each(&:delete)
         else
           channel.prune 100, strict: true
         end
