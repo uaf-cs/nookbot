@@ -117,6 +117,12 @@ discord.command(:source,
   'https://github.com/FineTralfazz/NookBot'
 end
 
+discord.command(:shutdown,
+                description: 'Gracefully shuts down the bot.',
+                usage: 'shutdown') do
+  discord.stop
+end
+
 discord.member_join do |event|
   event.user.pm.send_embed do |embed|
     embed.title = "Welcome to the UAF CS Discord! Here's some important info"\
