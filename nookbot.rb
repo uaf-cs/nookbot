@@ -102,7 +102,10 @@ discord.command(:dropclass,
   return 'Done'
 end
 
-discord.command(:classes, description: 'Lists classes', usage: 'classes') do
+discord.command(:classes,
+                description: 'Lists classes',
+                usage: 'classes',
+                aliases: %i[listclasses classlist]) do
   message = "Currently available class channels:\n"
   class_category_id = config['class_category_id']
   server.channels.select { |c| c.parent_id == class_category_id }.each do |c|
@@ -118,7 +121,7 @@ discord.command(:source,
 end
 
 discord.command(:shutdown,
-                description: 'Gracefully shuts down the bot.',
+                description: 'Gracefully shuts down the bot. Does not return.',
                 usage: 'shutdown') do
   discord.stop
 end
