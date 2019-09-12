@@ -185,7 +185,7 @@ discord.command(:dog, description: 'Gives random dog', usage: 'dog') do |event|
 end
 
 discord.command(:fact, description: 'Gives random fact', usage: 'fact') do
-  url = 'http://randomuselessfact.appspot.com/random.json?language=en'
+  url = 'https://uselessfacts.jsph.pl/random.json?language=en'
   uri = URI(url)
   response = Net::HTTP.get(uri)
   random_fact = JSON.parse(response)['text']
