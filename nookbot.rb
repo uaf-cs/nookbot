@@ -123,6 +123,8 @@ end
 discord.command(:shutdown,
                 description: 'Gracefully shuts down the bot. Does not return.',
                 usage: 'shutdown') do
+  authorized = admin_or_teacher? event.user
+  return "You don't have permission to use this command." unless authorized
   discord.stop
 end
 
