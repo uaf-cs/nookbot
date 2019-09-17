@@ -8,6 +8,7 @@ discord = Discordrb::Commands::CommandBot.new token: config['api_token'],
 discord.run :async
 
 server = discord.servers[config['server_id']]
+bot_start_time = Time.new
 
 def admin_or_teacher?(user)
   user.roles.each do |role|
@@ -127,6 +128,19 @@ discord.command(:shutdown,
   return "You don't have permission to use this command." unless authorized
 
   discord.stop
+end
+
+discord.command(:status,
+                description: 'Prints current bot/system status.',
+                usage: 'status') do
+  time_format = '%-l:%M %p, %B %e, %Y (%Z)'
+
+  uptime_file = File.open('/proc/uptime')
+  system_start_time = Time.new - uptime_file.read.split(' ')[0].to_i
+  uptime_file.close
+  return "```Bot up since #{bot_start_time.strftime(time_format)}.\n"\
+         "System up since #{system_start_time.strftime(time_format)}.\n"\
+         "Running on #{`hostname -f`.chomp}.```"
 end
 
 discord.member_join do |event|
