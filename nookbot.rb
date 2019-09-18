@@ -82,7 +82,7 @@ discord.command(:joinclass,
                               .map(&:name)
   roles = []
   class_id_array.each do |class_id|
-    return 'Invalid class id' unless class_channel_names.include? class_id
+    return "Invalid class id: #{class_id}" unless class_channel_names.include? class_id
 
     roles.push(server.roles.find { |r| r.name == "class-#{class_id}" })
   end
