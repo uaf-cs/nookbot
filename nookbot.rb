@@ -3,8 +3,13 @@ require 'net/https'
 require 'json'
 
 config = JSON.parse(File.read('config.json'))
-discord = Discordrb::Commands::CommandBot.new token: config['api_token'],
-                                              prefix: '!'
+discord = Discordrb::Commands::CommandBot.new(
+  token: config['api_token'],
+  prefix: '!',
+  command_doesnt_exist_message: 'Unrecognized command.',
+  channels: ['nookbot-den']
+)
+
 discord.run :async
 
 server = discord.servers[config['server_id']]
