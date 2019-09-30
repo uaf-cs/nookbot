@@ -33,7 +33,7 @@ discord.command(:createclass,
     class_id = class_id_raw.downcase.chomp
     return 'duplicate class' if class_channel_names.include? class_id
 
-    class_role = server.create_role name: "class-#{class_id}"
+    class_role = server.create_role name: "class-#{class_id}", permissions: 0
     everyone_role = server.roles.find { |r| r.name == '@everyone' }
 
     read_messages = Discordrb::Permissions.new
