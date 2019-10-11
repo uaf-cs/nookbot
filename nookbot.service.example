@@ -1,0 +1,15 @@
+# This will allow you to use NookBot as a systemd service.
+# Replace the paths as necessary and move to /etc/systemd/system/nookbot.service
+[Unit]
+Description=NookBot
+After=network.target
+
+[Service]
+Type=simple
+User=nookbot
+WorkingDirectory=/opt/nookbot
+ExecStart=/usr/bin/ruby nookbot.rb
+Restart=on-success
+
+[Install]
+WantedBy=multi-user.target
