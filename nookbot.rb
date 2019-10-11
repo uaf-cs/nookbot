@@ -220,5 +220,59 @@ discord.command(:hotdog,
   end
 end
 
+discord.command(:mute, description: 'Mutes Spud', usage: 'mute @user') do |event, *mentions|
+  authorized = admin_or_teacher? event.user
+  return "You don't have permission to use this command." unless authorized
+
+  return 'No users to mute.' if mentions.empty?
+
+  muted_role = server.roles.find { |r| r.name == 'Muted' }
+
+  return "You don't a muted role, what're you even trying to do?" if muted_role.nil?
+
+  response = ''
+  mentions.each do |mention|
+    id = mention.tr('<@!>', '').to_i
+    member = server.member(id)
+
+    if member.nil?
+      response += "#{mention} not found\n"
+    else
+      member.add_role(muted_role, "Muted by #{event.user.username}")
+      response += "#{member.mention} muted\n"
+    end
+  end
+  event.channel.send_embed do |embed|
+    embed.description = response
+  end
+end
+
+discord.command(:unmute, description: 'Unmutes Spud', usage: 'unmute @user') do |event, *mentions|
+  authorized = admin_or_teacher? event.user
+  return "You don't have permission to use this command." unless authorized
+
+  return 'No users to mute.' if mentions.empty?
+
+  muted_role = server.roles.find { |r| r.name == 'Muted' }
+
+  return "You don't a muted role, what're you even trying to do?" if muted_role.nil?
+
+  response = ''
+  mentions.each do |mention|
+    id = mention.tr('<@!>', '').to_i
+    member = server.member(id)
+
+    if member.nil?
+      response += "#{mention} not found\n" unless member
+    else
+      member.remove_role(muted_role, "Unmuted by #{event.user.username}")
+      response += "#{member.mention} unmuted\n"
+    end
+  end
+  event.channel.send_embed do |embed|
+    embed.description = response
+  end
+end
+
 discord.listening = '!help'
 discord.sync
