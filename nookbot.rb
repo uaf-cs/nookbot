@@ -150,6 +150,8 @@ discord.command(:status,
 end
 
 discord.member_join do |event|
+  
+  event.member.add_role(config['welcome_role'], "Autoroled")
   event.user.pm.send_embed do |embed|
     embed.title = "Welcome to the UAF CS Discord! Here's some important info"\
                   'to get you started on the server.'
