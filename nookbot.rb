@@ -123,7 +123,7 @@ end
 discord.command(:source,
                 description: 'Tells you where to find the source code',
                 usage: 'source') do
-  'https://github.com/computer-science-discord/nookbot'
+  'https://github.com/uaf-cs/nookbot'
 end
 
 discord.command(:shutdown,
