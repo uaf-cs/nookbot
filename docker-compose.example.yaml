@@ -1,0 +1,7 @@
+version: '3'
+services:
+  nookbot:
+    build: .
+    restart: unless-stopped
+    environment:
+      DISCORD_TOKEN: discordTokenHere
