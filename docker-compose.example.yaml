@@ -4,4 +4,30 @@ services:
     build: .
     restart: unless-stopped
     environment:
-      DISCORD_TOKEN: discordTokenHere
+      # The root URL that the API will be served on
+      API_ROOT:
+
+      # IDs for the guild and roles
+      CS_GUILD:
+      CS_STUDENT:
+      CS_ALUMNUS:
+      CS_TEACHER:
+
+      # Discord application information
+      DISCORD_CLIENT_ID:
+      DISCORD_CLIENT_SECRET:
+      DISCORD_TOKEN:
+
+      # Google application information
+      GOOGLE_CLIENT_ID:
+      GOOGLE_CLIENT_SECRET:
+
+      REDIS_URL: redis://redis/
+      SESSION_SECRET:
+    ports:
+      - 127.0.0.1:3000:3000
+    depends_on:
+      - redis
+  redis:
+    image: redis:6-alpine
+    restart: unless-stopped
