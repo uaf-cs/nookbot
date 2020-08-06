@@ -9,6 +9,7 @@ services:
 
       # IDs for the guild and roles
       CS_GUILD:
+      CS_ADMIN:
       CS_STUDENT:
       CS_ALUMNUS:
       CS_TEACHER:
