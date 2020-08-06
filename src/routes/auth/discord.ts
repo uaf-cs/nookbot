@@ -40,15 +40,6 @@ router.get('/callback', passport.authenticate('discord', {
     } catch {
       req.session.updatedNickname = false
     }
-    const classes = await r.lrange('classes.list', 0, -1)
-    req.session.classes = member.roles.filter(r => classes.includes(r))
-    if (member.roles.includes(process.env.CS_STUDENT)) {
-      req.session.status = 'student'
-    } else if (member.roles.includes(process.env.CS_ALUMNUS)) {
-      req.session.status = 'alumnus'
-    } else if (member.roles.includes(process.env.CS_TEACHER)) {
-      req.session.status = 'teacher'
-    }
   }
   res.redirect('/')
 })
