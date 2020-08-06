@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Profile as DiscordProfile } from 'passport-discord'
 import { Profile as GoogleProfile } from 'passport-google-oauth'
 

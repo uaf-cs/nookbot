@@ -3,7 +3,6 @@ import passport from 'passport'
 import { Strategy } from 'passport-discord'
 
 import bot from '../../config/bot'
-import { r } from '../../config/redis'
 
 passport.use(new Strategy({
   clientID: process.env.DISCORD_CLIENT_ID,
