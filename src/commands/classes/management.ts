@@ -1,15 +1,18 @@
-import { CommandClient, TextChannel } from 'eris'
+import { CommandClient, TextChannel, Message } from 'eris'
 import { r } from '../../config/redis'
 
 const moderatorOptions = {
-  roleIDs: [
-    process.env.CS_TEACHER,
-    process.env.CS_ADMIN
-  ]
+  custom: (msg: Message) => {
+    return msg.member.roles.find(r => [
+      process.env.CS_TEACHER,
+      process.env.CS_ADMIN
+    ].includes(r)) !== undefined
+  }
 }
 
 export const init = (bot: CommandClient): void => {
   bot.registerCommand('addclasses', async (msg) => {
+    await msg.channel.sendTyping()
     const response: string[] = []
     const [,...courseList] = msg.content.split('\n')
     for (const c of courseList) {

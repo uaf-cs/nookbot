@@ -41,7 +41,7 @@ web.use(passport.session())
 web.use(routes)
 
 // Serve our amazing API
-const server = web.listen(3000)
+const server = web.listen(80)
 
 // Load all our commands
 commands.init(bot)
