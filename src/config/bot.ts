@@ -1,6 +1,8 @@
 import { CommandClient } from 'eris'
 
-const bot = new CommandClient(process.env.DISCORD_TOKEN)
+const bot = new CommandClient(process.env.DISCORD_TOKEN, {}, {
+  prefix: ['@mention', '!']
+})
 // It'd be nice to know if the bot is ready or not
 bot.on('ready', () => {
   const { username, discriminator } = bot.user
