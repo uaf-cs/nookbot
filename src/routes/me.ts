@@ -6,7 +6,7 @@ import { r } from '../config/redis'
 const router = Router()
 
 router.use(async (req, res, next) => {
-  if (req.isAuthenticated()) {
+  if (req.isAuthenticated() && req.user.google !== undefined && req.user.discord !== undefined) {
     // Update member session
     const member = bot.guilds.get(process.env.CS_GUILD).members.get(req.user.discord.id)
     if (member === undefined) {
