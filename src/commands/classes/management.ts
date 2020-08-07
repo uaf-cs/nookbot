@@ -11,7 +11,12 @@ const moderatorOptions = {
 }
 
 export const init = (bot: CommandClient): void => {
-  bot.registerCommand('addclasses', async (msg) => {
+  bot.registerCommand('addclasses', async (msg, [parent]) => {
+    const { guild } = msg.channel as TextChannel
+    if (guild.channels.get(parent) === undefined) {
+      await msg.channel.createMessage('Please provide a valid parent category ID')
+      return
+    }
     await msg.channel.sendTyping()
     const response: string[] = []
     const [,...courseList] = msg.content.split('\n')
@@ -25,7 +30,6 @@ export const init = (bot: CommandClient): void => {
         enrolment,
         sessionCode
       ] = c.split(',')
-      const { guild } = msg.channel as TextChannel
       const role = await guild.createRole({
         name: `${subject}${course} - ${section} ${instructor}`,
         permissions: 0
@@ -34,6 +38,7 @@ export const init = (bot: CommandClient): void => {
         `${subject}${course}-${section}`,
         0,
         {
+          parentID: parent,
           permissionOverwrites: [
             {
               // @everyone, allow none, deny read messages.
