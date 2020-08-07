@@ -14,21 +14,6 @@ router.use(async (req, res, next) => {
     } else {
       req.session.inGuild = true
 
-      // Make sure their nick matches their name
-      const { displayName } = req.user.google
-      if (member.nick !== displayName || member.username !== displayName) {
-        try {
-          await member.edit({
-            nick: displayName
-          })
-          req.session.updatedNickname = true
-        } catch {
-          req.session.updatedNickname = false
-        }
-      } else {
-        req.session.updatedNickname = true
-      }
-
       if (!member.roles.includes(process.env.CS_APPROVED)) {
         await member.addRole(process.env.CS_APPROVED)
       }
@@ -43,6 +28,21 @@ router.use(async (req, res, next) => {
       } else if (member.roles.includes(process.env.CS_TEACHER)) {
         req.session.status = 'teacher'
       }
+    }
+
+    // Make sure their nick matches their name
+    const { displayName } = req.user.google
+    if (member.nick === undefined && req.session.status !== 'teacher') {
+      try {
+        await member.edit({
+          nick: displayName
+        })
+        req.session.updatedNickname = true
+      } catch {
+        req.session.updatedNickname = false
+      }
+    } else {
+      req.session.updatedNickname = true
     }
     next()
   } else {
