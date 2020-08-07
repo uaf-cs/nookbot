@@ -29,6 +29,10 @@ router.use(async (req, res, next) => {
         req.session.updatedNickname = true
       }
 
+      if (!member.roles.includes(process.env.CS_APPROVED)) {
+        await member.addRole(process.env.CS_APPROVED)
+      }
+
       // Sync classes
       const classes = await r.lrange('class.list', 0, -1)
       req.session.classes = member.roles.filter(r => classes.includes(r))
