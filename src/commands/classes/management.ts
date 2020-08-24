@@ -1,4 +1,4 @@
-import { CommandClient, TextChannel, Message, PermissionOverwrite, CreateChannelOptions } from 'eris'
+import { CommandClient, TextChannel, Message } from 'eris'
 import { r } from '../../config/redis'
 
 const moderatorOptions = {
