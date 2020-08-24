@@ -31,14 +31,6 @@ router.get('/callback', passport.authenticate('discord', {
     req.session.inGuild = false
   } else {
     req.session.inGuild = true
-    try {
-      await member.edit({
-        nick: req.user.google.displayName
-      })
-      req.session.updatedNickname = true
-    } catch {
-      req.session.updatedNickname = false
-    }
   }
   res.redirect('/')
 })
