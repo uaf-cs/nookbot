@@ -1,4 +1,4 @@
-import { CommandClient, TextChannel, Message } from 'eris'
+import { CommandClient, TextChannel, Message, PermissionOverwrite, CreateChannelOptions } from 'eris'
 import { r } from '../../config/redis'
 
 const moderatorOptions = {
@@ -8,6 +8,44 @@ const moderatorOptions = {
       process.env.CS_ADMIN
     ].includes(r)) !== undefined
   }
+}
+
+const generateOverwrites = (role: string): Array<{
+  id: string
+  type: 'role'|'member'
+  allow: number
+  deny: number
+}> => {
+  return [
+    {
+      // @everyone, allow none, deny read messages.
+      id: process.env.CS_GUILD,
+      type: 'role',
+      allow: 0,
+      deny: 1024
+    },
+    {
+      // Teachers, allow mention everyone and manage messages, deny none
+      id: process.env.CS_TEACHER,
+      type: 'role',
+      allow: 139264,
+      deny: 0
+    },
+    // {
+    //   // Muted, allow none, deny send messages
+    //   id: process.env.CS_MUTED,
+    //   type: 'role',
+    //   allow: 0,
+    //   deny: 2048
+    // },
+    {
+      // Class role, allow read messages, deny none
+      id: role,
+      type: 'role',
+      allow: 1024,
+      deny: 0
+    }
+  ]
 }
 
 export const init = (bot: CommandClient): void => {
@@ -39,36 +77,7 @@ export const init = (bot: CommandClient): void => {
         0,
         {
           parentID: parent,
-          permissionOverwrites: [
-            {
-              // @everyone, allow none, deny read messages.
-              id: guild.id,
-              type: 'role',
-              allow: 0,
-              deny: 1024
-            },
-            {
-              // Teachers, allow mention everyone, deny none
-              id: process.env.CS_TEACHER,
-              type: 'role',
-              allow: 131072,
-              deny: 0
-            },
-            // {
-            //   // Muted, allow none, deny send messages
-            //   id: process.env.CS_MUTED,
-            //   type: 'role',
-            //   allow: 0,
-            //   deny: 2048
-            // },
-            {
-              // Class role, allow read messages, deny none
-              id: role.id,
-              type: 'role',
-              allow: 1024,
-              deny: 0
-            }
-          ]
+          permissionOverwrites: generateOverwrites(role.id)
         }
       )
       await r.lpush('class.list', role.id)
@@ -87,6 +96,29 @@ export const init = (bot: CommandClient): void => {
     await msg.channel.createMessage(response.join('\n'))
   }, {
     description: 'Add classes in bulk from a CSV file',
+    requirements: moderatorOptions,
+    guildOnly: true
+  })
+
+  bot.registerCommand('sync', async msg => {
+    const typing = msg.channel.sendTyping()
+    const classes = await r.lrange('class.list', 0, -1)
+    const { guild } = msg.channel as TextChannel
+    const classPromises = classes.map(async c => {
+      const classJson = await r.get(`class:${c}`)
+      const classChannelId = JSON.parse(classJson).channel as string
+      const classChannel = guild.channels.get(classChannelId)
+      if (classChannel !== undefined) {
+        const overwrites = generateOverwrites(c)
+        for (const ow of overwrites) {
+          await classChannel.editPermission(ow.id, ow.allow, ow.deny, ow.type, 'Syncing class channels')
+        }
+      }
+    })
+    await Promise.all([typing, ...classPromises])
+    await msg.channel.createMessage('Done')
+  }, {
+    description: 'Sync class channel permissions to the latest defined in the source.',
     requirements: moderatorOptions,
     guildOnly: true
   })
