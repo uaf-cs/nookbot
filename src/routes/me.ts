@@ -11,6 +11,7 @@ router.use(async (req, res, next) => {
     const member = bot.guilds.get(process.env.CS_GUILD).members.get(req.user.discord.id)
     if (member === undefined) {
       req.session.inGuild = false
+      req.session.updatedNickname = false
     } else {
       req.session.inGuild = true
 
@@ -28,21 +29,21 @@ router.use(async (req, res, next) => {
       } else if (member.roles.includes(process.env.CS_TEACHER)) {
         req.session.status = 'teacher'
       }
-    }
 
-    // Make sure their nick matches their name
-    const { displayName } = req.user.google
-    if (member.nick === undefined && req.session.status !== 'teacher') {
-      try {
-        await member.edit({
-          nick: displayName
-        })
+      // Make sure their nick matches their name
+      const { displayName } = req.user.google
+      if (member.nick === undefined && req.session.status !== 'teacher') {
+        try {
+          await member.edit({
+            nick: displayName
+          })
+          req.session.updatedNickname = true
+        } catch {
+          req.session.updatedNickname = false
+        }
+      } else {
         req.session.updatedNickname = true
-      } catch {
-        req.session.updatedNickname = false
       }
-    } else {
-      req.session.updatedNickname = true
     }
     next()
   } else {
