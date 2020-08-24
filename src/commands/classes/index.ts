@@ -11,8 +11,7 @@ export const init = (bot: CommandClient): void => {
     'Class registration has been moved to https://nookbot.katlyn.dev/. Please use the website to join classes and gain access to their channels.',
     {
       aliases: ['join'],
-      hidden: true,
-      description: 'please don\'t use this command <:catto:535716923225276416>'
+      description: 'Join classes with https://nookbot.katlyn.dev/'
     }
   )
 }
