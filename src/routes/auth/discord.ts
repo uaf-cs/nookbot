@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import fetch from 'node-fetch'
 import passport from 'passport'
 import { Strategy } from 'passport-discord'
 
@@ -8,12 +9,20 @@ passport.use(new Strategy({
   clientID: process.env.DISCORD_CLIENT_ID,
   clientSecret: process.env.DISCORD_CLIENT_SECRET,
   callbackURL: `${process.env.API_ROOT}/auth/discord/callback`,
-  scope: ['identify'],
+  scope: ['identify', 'guilds.join'],
   passReqToCallback: true
-}, (req, accessToken, refreshToken, profile, done) => {
+}, async (req, accessToken, refreshToken, profile, done) => {
   if (req.user?.google === undefined) {
     done(Error('must link google'))
   } else {
+    await fetch(`https://discord.com/api/guilds/${process.env.CS_GUILD}/members/${profile.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bot ${process.env.DISCORD_TOKEN}`
+      },
+      body: JSON.stringify({ access_token: accessToken })
+    })
     done(null, { ...req.user, discord: profile })
   }
 }))
