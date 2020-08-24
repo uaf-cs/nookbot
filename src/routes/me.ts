@@ -32,13 +32,14 @@ router.use(async (req, res, next) => {
 
       // Make sure their nick matches their name
       const { displayName } = req.user.google
-      if (member.nick === undefined && req.session.status !== 'teacher') {
+      if (member.nick === null && req.session.status !== 'teacher') {
         try {
           await member.edit({
             nick: displayName
           })
           req.session.updatedNickname = true
-        } catch {
+        } catch (err) {
+          console.error(`Unabled to update nickname ${member.id}`, err)
           req.session.updatedNickname = false
         }
       } else {
