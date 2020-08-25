@@ -1,5 +1,7 @@
 import { CommandClient, TextChannel, Message } from 'eris'
 import { r } from '../../config/redis'
+import { RedisClass } from '../../custom'
+import { getReply } from '../../config/bot'
 
 const moderatorOptions = {
   custom: (msg: Message) => {
@@ -119,6 +121,91 @@ export const init = (bot: CommandClient): void => {
     await msg.channel.createMessage('Done')
   }, {
     description: 'Sync class channel permissions to the latest defined in the source.',
+    requirements: moderatorOptions,
+    guildOnly: true
+  })
+
+  bot.registerCommand('merge', async (msg, args) => {
+    if (args.length !== 2) {
+      await msg.channel.createMessage('Invalid usage.')
+      return
+    }
+    const [to, from] = await Promise.all(args.map(async id => JSON.parse(await r.get(`class:${id}`)) as RedisClass))
+    const [toId, fromId] = args
+    if (to === null) {
+      await msg.channel.createMessage(`Class ${toId} not found`)
+      return
+    }
+    if (from === null) {
+      await msg.channel.createMessage(`Class ${fromId} not found`)
+      return
+    }
+
+    // Make sure that these are the classes that they actually want to merge
+    const confirmationText = `${from.subject}-${from.course}>${to.subject}-${to.course}`
+    await msg.channel.createMessage(`Are you sure you want to merge ${from.subject}-${from.course} into ${to.subject}-${to.course}?\nReply with \`${confirmationText}\` to confirm.`)
+    const confirmation = await getReply(msg.channel, msg.author)
+
+    if (confirmation.content !== confirmationText) {
+      await msg.channel.createMessage('Confirmation does not match, not merging classes.')
+      return
+    }
+
+    const { guild } = msg.channel as TextChannel
+    await Promise.all(guild.members.map(async m => {
+      if (m.roles.includes(fromId)) {
+        await m.addRole(toId, 'Class migration')
+      }
+    }))
+    const classJson = await r.get(`class:${fromId}`)
+    const fromClass = JSON.parse(classJson) as RedisClass
+    try {
+      await Promise.all([
+        guild.deleteRole(fromId),
+        guild.channels.get(fromClass.channel).delete(),
+        r.lrem('class.list', 0, fromId),
+        r.del(`class:${fromId}`)
+      ])
+    } catch {}
+    await msg.channel.createMessage('Classes merged.')
+  }, {
+    description: 'Merge two classes.',
+    fullDescription: 'The first class will be the one to stay. The second will have all students moved to the first and will be destroyed.',
+    usage: 'to-id from-id',
+    requirements: moderatorOptions,
+    guildOnly: true
+  })
+
+  bot.registerCommand('deleteclass', async (msg, args) => {
+    const [classId] = args
+    const classMetadata = JSON.parse(await r.get(`class:${classId}`)) as RedisClass
+    if (classMetadata === null) {
+      await msg.channel.createMessage('Class not found')
+      return
+    }
+
+    // Make sure they actually want to delete this course
+    const confirmationText = `${classMetadata.subject}-${classMetadata.course}`
+    await msg.channel.createMessage(`Are you sure you want to delete ${confirmationText} course? Reply with \`${confirmationText}\``)
+    const confirmation = await getReply(msg.channel, msg.author)
+
+    if (confirmation.content !== confirmationText) {
+      await msg.channel.createMessage('Confirmation does not match, not deleting course.')
+      return
+    }
+
+    const { guild } = msg.channel as TextChannel
+    try {
+      await Promise.all([
+        guild.deleteRole(classId),
+        guild.channels.get(classMetadata.channel).delete(),
+        r.lrem('class.list', 0, classId),
+        r.del(`class:${classId}`)
+      ])
+    } catch {}
+    await msg.channel.createMessage('Class deleted.')
+  }, {
+    description: 'Delete a class',
     requirements: moderatorOptions,
     guildOnly: true
   })

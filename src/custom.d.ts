@@ -16,3 +16,14 @@ declare global {
     }
   }
 }
+
+export interface RedisClass {
+  channel: string
+  subject: string
+  course: string
+  section: string
+  title: string
+  instructor: string
+  enrolment: number
+  sessionCode: string
+}
