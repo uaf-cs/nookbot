@@ -52,8 +52,10 @@ bot.connect()
 
 // Cleanly shut things down
 process.on('SIGTERM', () => {
+  console.log('recieved SIGTERM, killing')
   server.close()
   bot.disconnect({
     reconnect: false
   })
+  process.exit()
 })
