@@ -142,8 +142,8 @@ export const init = (bot: CommandClient): void => {
     }
 
     // Make sure that these are the classes that they actually want to merge
-    const confirmationText = `${from.subject}-${from.course}>${to.subject}-${to.course}`
-    await msg.channel.createMessage(`Are you sure you want to merge ${from.subject}-${from.course} into ${to.subject}-${to.course}?\nReply with \`${confirmationText}\` to confirm.`)
+    const confirmationText = `${from.subject}-${from.course}-${from.section}>${to.subject}-${to.course}-${to.section}`
+    await msg.channel.createMessage(`Are you sure you want to merge ${from.subject}-${from.course}-${from.section} into ${to.subject}-${to.course}-${to.section}?\nReply with \`${confirmationText}\` to confirm.`)
     const confirmation = await getReply(msg.channel, msg.author)
 
     if (confirmation.content !== confirmationText) {
@@ -185,7 +185,7 @@ export const init = (bot: CommandClient): void => {
     }
 
     // Make sure they actually want to delete this course
-    const confirmationText = `${classMetadata.subject}-${classMetadata.course}`
+    const confirmationText = `${classMetadata.subject}-${classMetadata.course}-${classMetadata.section}`
     await msg.channel.createMessage(`Are you sure you want to delete ${confirmationText} course? Reply with \`${confirmationText}\``)
     const confirmation = await getReply(msg.channel, msg.author)
 
