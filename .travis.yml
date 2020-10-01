@@ -1,3 +1,0 @@
-language: ruby
-script: bundle exec rubocop
-cache: bundler
