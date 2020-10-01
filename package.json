@@ -10,7 +10,7 @@
     "express-session": "^1.17.1",
     "googleapis": "^58.0.0",
     "ioredis": "^4.17.3",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "passport": "^0.4.1",
     "passport-discord": "^0.1.4",
     "passport-google-oauth": "^2.0.0",
