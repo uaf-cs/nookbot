@@ -1,4 +1,4 @@
-import { CommandClient } from 'eris'
+import { CommandClient, EmbedOptions } from 'eris'
 import fetch from 'node-fetch'
 
 export const init = (bot: CommandClient): void => {
@@ -63,16 +63,59 @@ export const init = (bot: CommandClient): void => {
   })
 
   bot.registerCommand('hotdog', async msg => {
-    await msg.channel.createMessage({
-      embed: {
-        image: {
-          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Hotdog_-_Evan_Swigart.jpg/1200px-Hotdog_-_Evan_Swigart.jpg'
-        }
+    const embed: EmbedOptions = {
+      image: {
+        url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Hotdog_-_Evan_Swigart.jpg/1200px-Hotdog_-_Evan_Swigart.jpg'
       }
-    })
+    }
+
+    // Give Cam's favourite hotdog a chance to show up.
+    if (Math.floor(Math.random() * 2) === 1) {
+      try {
+        const hotdog = await fetch('https://source.unsplash.com/1600x900/?hotdog', {
+          method: 'HEAD'
+        })
+        embed.image.url = hotdog.url
+      } catch (err) {
+        // If it fails we don't really care, since we already have the placeholder
+      }
+    }
+
+    await msg.channel.createMessage({ embed })
   }, {
     description: 'Gives a random hotdog',
     usage: 'hotdog'
+  })
+
+  bot.registerCommand('snowman', async msg => {
+    try {
+      const req = await fetch('https://source.unsplash.com/1600x900/?snowman', {
+        method: 'HEAD'
+      })
+      if (req.ok) {
+        await msg.channel.createMessage({
+          embed: {
+            image: {
+              url: req.url
+            }
+          }
+        })
+      } else {
+        await msg.channel.createMessage({
+          embed: {
+            description: "Hm, looks like I can't find any snowmen right now :<",
+            footer: {
+              text: `HTTP error ${req.status}`
+            }
+          }
+        })
+      }
+    } catch (error) {
+      await msg.channel.createMessage(`Something went very wrong and I wasn't able to make the request.\n\`${(error as Error).message}\``)
+    }
+  }, {
+    description: 'Gives a random snowman',
+    usage: 'snowman'
   })
 }
 
