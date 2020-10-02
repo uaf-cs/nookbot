@@ -106,6 +106,20 @@ router.post('/status', async (req, res) => {
 })
 
 router.post('/courses/:id', async (req, res) => {
+  const member = bot.guilds.get(process.env.CS_GUILD).members.get(req.user.discord.id)
+
+  if (member.roles.filter(
+    role =>
+      [
+        process.env.CS_STUDENT,
+        process.env.CS_ALUMNUS,
+        process.env.CS_TEACHER
+      ].includes(role)).length === 0
+  ) {
+    res.status(400)
+    return res.json({ status: 'User has no status' })
+  }
+
   const courseExists = await r.exists(`class:${req.params.id}`)
   if (courseExists === 0) {
     res.status(404)
@@ -113,7 +127,7 @@ router.post('/courses/:id', async (req, res) => {
   } else {
     await bot.addGuildMemberRole(
       process.env.CS_GUILD,
-      req.user.discord.id,
+      member.id,
       req.params.id,
       'Assigning class role'
     )
