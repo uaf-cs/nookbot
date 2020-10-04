@@ -22,12 +22,14 @@ export const init = (bot: CommandClient): void => {
 		const author = 'Created by ' + msg.author + ' in ' + date;
 
 		// Create 'fields' array with poll options and reactions
-		const fields = []
+		const reactions : Array<string> = []
+		const fields : Array<Field> = []
 		for (let i in opts) {
 			let res = <Field>{}
 			const parsed = opts[i].split(',') 
 			const key = parsed[0].trim();
 			const value = parsed[1].trim()
+			reactions.push(value);
 			res = {
 				name: key,
 				value: value,
@@ -44,8 +46,12 @@ export const init = (bot: CommandClient): void => {
 					text: author
 				}
 			}
-		});
-	})
+		}).then(embedMessage => {
+			for (let i in reactions) {
+				embedMessage.addReaction(reactions[i]);
+			}
+		})
+	});
 }
 
 export default {
