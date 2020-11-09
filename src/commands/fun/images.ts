@@ -72,7 +72,7 @@ export const init = (bot: CommandClient): void => {
     // Give Cam's favourite hotdog a chance to show up.
     if (Math.floor(Math.random() * 2) === 1) {
       try {
-        const hotdog = await fetch('https://source.unsplash.com/1600x900/?hotdog', {
+        const hotdog = await fetch('https://source.unsplash.com/featured/?hotdog', {
           method: 'HEAD'
         })
         embed.image.url = hotdog.url
@@ -89,7 +89,7 @@ export const init = (bot: CommandClient): void => {
 
   bot.registerCommand('snowman', async msg => {
     try {
-      const req = await fetch('https://source.unsplash.com/1600x900/?snowman', {
+      const req = await fetch('https://source.unsplash.com/featured/?snowman', {
         method: 'HEAD'
       })
       if (req.ok) {
