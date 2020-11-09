@@ -120,7 +120,7 @@ export const init = (bot: CommandClient): void => {
 
   bot.registerCommand('unsplash', async (msg, args) => {
     try {
-      const req = await fetch(`https://source.unsplash.com/featured/?${args.join(',')}`, {
+      const req = await fetch(`https://source.unsplash.com/featured/?${encodeURI(args.join(','))}`, {
         method: 'HEAD'
       })
       if (req.ok) {
