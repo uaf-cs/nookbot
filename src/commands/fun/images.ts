@@ -117,6 +117,37 @@ export const init = (bot: CommandClient): void => {
     description: 'Gives a random snowman',
     usage: 'snowman'
   })
+
+  bot.registerCommand('unsplash', async (msg, args) => {
+    try {
+      const req = await fetch(`https://source.unsplash.com/featured/?${args.join(',')}`, {
+        method: 'HEAD'
+      })
+      if (req.ok) {
+        await msg.channel.createMessage({
+          embed: {
+            image: {
+              url: req.url
+            }
+          }
+        })
+      } else {
+        await msg.channel.createMessage({
+          embed: {
+            description: "Hm, looks like I can't find any pictures right now :<",
+            footer: {
+              text: `HTTP error ${req.status}`
+            }
+          }
+        })
+      }
+    } catch (error) {
+      await msg.channel.createMessage(`Something went very wrong and I wasn't able to make the request.\n\`${(error as Error).message}\``)
+    }
+  }, {
+    description: 'Gives a random image from unsplash based on keywords provided',
+    usage: 'unsplash'
+  })
 }
 
 export default {
