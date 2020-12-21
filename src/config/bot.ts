@@ -1,10 +1,16 @@
 import { CommandClient, Message, Channel, User } from 'eris'
 
-const bot = new CommandClient(process.env.DISCORD_TOKEN, {}, {
+const bot = new CommandClient(process.env.DISCORD_TOKEN, {
+  intents: [
+    'guildMembers',
+    'guildMessages'
+  ]
+}, {
   prefix: ['@mention', '!'],
   description: 'Utilties for UAF-CS',
   owner: 'UAF Students'
 })
+
 // It'd be nice to know if the bot is ready or not
 bot.on('ready', () => {
   const { username, discriminator } = bot.user
