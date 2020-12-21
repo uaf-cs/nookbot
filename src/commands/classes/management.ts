@@ -1,4 +1,6 @@
+import { randomBytes } from 'crypto'
 import { CommandClient, TextChannel, Message } from 'eris'
+
 import { r } from '../../config/redis'
 import { RedisClass } from '../../custom'
 import { getReply } from '../../config/bot'
@@ -206,6 +208,43 @@ export const init = (bot: CommandClient): void => {
     await msg.channel.createMessage('Class deleted.')
   }, {
     description: 'Delete a class',
+    requirements: moderatorOptions,
+    guildOnly: true
+  })
+
+  bot.registerCommand('cleanup', async msg => {
+    const courseIDs = await r.lrange('class.list', 0, -1)
+    const promiseDetails = courseIDs.map(async c => ({ id: c, raw: await r.get(`class:${c}`) }))
+    const details = await Promise.all(promiseDetails)
+    const courses = details.map(c => ({ id: c.id, ...JSON.parse(c.raw) as RedisClass }))
+
+    const confirmationText = Math.floor(Math.random() * 100000).toString()
+
+    // Make sure that this is intended
+    await msg.channel.createMessage(`Are you sure you want to delete all ${courses.length} course channels? Reply with \`${confirmationText}\``)
+    const confirmation = await getReply(msg.channel, msg.author)
+
+    if (confirmation.content !== confirmationText) {
+      await msg.channel.createMessage('Confirmation does not match, not running cleanup.')
+      return
+    }
+
+    await msg.channel.sendTyping()
+
+    const { guild } = msg.channel as TextChannel
+    await Promise.all(courses.map(async c => {
+      try {
+        await Promise.all([
+          guild.deleteRole(c.id),
+          guild.channels.get(c.channel).delete(),
+          r.lrem('class.list', 0, c.id),
+          r.del(`class:${c.id}`)
+        ])
+      } catch {}
+    }))
+    await msg.channel.createMessage('Cleanup complete.')
+  }, {
+    description: 'Delete all class channels for end of semester cleanup. This is a *very* destructive operation.',
     requirements: moderatorOptions,
     guildOnly: true
   })
