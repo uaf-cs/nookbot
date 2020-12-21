@@ -2,6 +2,7 @@ import { CommandClient, Message, Channel, User } from 'eris'
 
 const bot = new CommandClient(process.env.DISCORD_TOKEN, {
   intents: [
+    'guilds',
     'guildMembers',
     'guildMessages'
   ]
