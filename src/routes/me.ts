@@ -39,7 +39,6 @@ router.use(async (req, res, next) => {
           })
           req.session.updatedNickname = true
         } catch (err) {
-          console.error(`Unabled to update nickname ${member.id}`, err)
           req.session.updatedNickname = false
         }
       } else {
@@ -102,7 +101,11 @@ router.post('/status', async (req, res) => {
     default:
       res.status(400)
       res.json({ error: 'invalid status' })
+      return
   }
+
+  res.status(200)
+  res.json({ status })
 })
 
 router.post('/courses/:id', async (req, res) => {
