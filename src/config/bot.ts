@@ -5,7 +5,8 @@ const bot = new CommandClient(process.env.DISCORD_TOKEN, {
     'guilds',
     'guildMembers',
     'guildMessages'
-  ]
+  ],
+  getAllUsers: true
 }, {
   prefix: ['@mention', '!'],
   description: 'Utilties for UAF-CS',
