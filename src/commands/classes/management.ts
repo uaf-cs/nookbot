@@ -1,4 +1,3 @@
-import { randomBytes } from 'crypto'
 import { CommandClient, TextChannel, Message } from 'eris'
 
 import { r } from '../../config/redis'
