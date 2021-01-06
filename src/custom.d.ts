@@ -8,6 +8,7 @@ declare global {
       inGuild: boolean
       updatedNickname: boolean
       classes: string[]
+      subjects: string[]
       status: 'student' | 'alumnus' | 'teacher'
     }
     export interface User {
