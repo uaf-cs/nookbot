@@ -22,6 +22,8 @@ router.use(async (req, res, next) => {
       // Sync classes
       const classes = await r.lrange('class.list', 0, -1)
       req.session.classes = member.roles.filter(r => classes.includes(r))
+      const subjects = await r.lrange('subject.list', 0, -1)
+      req.session.subjects = member.roles.filter(r => subjects.includes(r))
       if (member.roles.includes(process.env.CS_STUDENT)) {
         req.session.status = 'student'
       } else if (member.roles.includes(process.env.CS_ALUMNUS)) {
@@ -150,6 +152,54 @@ router.delete('/courses/:id', async (req, res) => {
       req.user.discord.id,
       req.params.id,
       'Removing class role'
+    )
+    res.status(200)
+    res.json({ status: 'ok' })
+  }
+})
+
+router.post('/subjects/:id', async (req, res) => {
+  const member = bot.guilds.get(process.env.CS_GUILD).members.get(req.user.discord.id)
+
+  if (member.roles.filter(
+    role =>
+      [
+        process.env.CS_STUDENT,
+        process.env.CS_ALUMNUS,
+        process.env.CS_TEACHER
+      ].includes(role)).length === 0
+  ) {
+    res.status(400)
+    return res.json({ status: 'User has no status' })
+  }
+
+  const subjectExists = await r.exists(`subject:${req.params.id}`)
+  if (subjectExists === 0) {
+    res.status(404)
+    res.json({ error: 'subject not found' })
+  } else {
+    await bot.addGuildMemberRole(
+      process.env.CS_GUILD,
+      member.id,
+      req.params.id,
+      'Assigning subject role'
+    )
+    res.status(200)
+    res.json({ status: 'ok' })
+  }
+})
+
+router.delete('/subjects/:id', async (req, res) => {
+  const subjectExists = await r.exists(`subject:${req.params.id}`)
+  if (subjectExists === 0) {
+    res.status(404)
+    res.json({ error: 'subject not found' })
+  } else {
+    await bot.removeGuildMemberRole(
+      process.env.CS_GUILD,
+      req.user.discord.id,
+      req.params.id,
+      'Removing subject role'
     )
     res.status(200)
     res.json({ status: 'ok' })
