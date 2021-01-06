@@ -1,8 +1,17 @@
+import parse from 'csv-parse/lib/sync'
 import { CommandClient, TextChannel, Message } from 'eris'
 
 import { r } from '../../config/redis'
 import { RedisClass } from '../../custom'
 import { getReply } from '../../config/bot'
+
+interface CsvCourse {
+  COURSE_SUBJ_CODE: string
+  COURSE_COURSE_CODE: string
+  COURSE_SECTION_NUMBER: string
+  COURSE_TITLE: string
+  COURSE_INSTRUCTOR: string
+}
 
 const moderatorOptions = {
   custom: (msg: Message) => {
@@ -60,45 +69,62 @@ export const init = (bot: CommandClient): void => {
     }
     await msg.channel.sendTyping()
     const response: string[] = []
-    const [,...courseList] = msg.content.split('\n')
-    for (const c of courseList) {
-      const [
-        subject,
-        course,
-        section,
-        title,
-        instructor,
-        enrolment,
-        sessionCode
-      ] = c.split(',')
-      const role = await guild.createRole({
-        name: `${subject}${course} - ${section} ${instructor}`,
-        permissions: 0
+    const courseCSV = msg.content.slice(msg.content.indexOf('\n'))
+    try {
+      const courseList: CsvCourse[] = parse(courseCSV, {
+        columns: true
       })
-      const channel = await guild.createChannel(
-        `${subject}${course}-${section}`,
-        0,
-        {
-          parentID: parent,
-          permissionOverwrites: generateOverwrites(role.id)
+      for (const c of courseList) {
+        // Make sure all required keys are present
+        const requiredKeys = [
+          'COURSE_SUBJ_CODE',
+          'COURSE_COURSE_CODE',
+          'COURSE_SECTION_NUMBER',
+          'COURSE_TITLE',
+          'COURSE_INSTRUCTOR'
+        ]
+        if (!requiredKeys.every(k => Object.keys(c).includes(k))) {
+          response.push('Course is missing required keys')
+          continue
         }
-      )
-      await r.lpush('class.list', role.id)
-      await r.set(`class:${role.id}`, JSON.stringify({
-        channel: channel.id,
-        subject,
-        course,
-        section,
-        title,
-        instructor,
-        enrolment,
-        sessionCode
-      }))
-      response.push(`Added ${role.mention}`)
+
+        const {
+          COURSE_SUBJ_CODE: subject,
+          COURSE_COURSE_CODE: course,
+          COURSE_SECTION_NUMBER: section,
+          COURSE_TITLE: title,
+          COURSE_INSTRUCTOR: instructor
+        } = c
+        const role = await guild.createRole({
+          name: `${subject}${course} - ${section} ${instructor}`,
+          permissions: 0
+        })
+        const channel = await guild.createChannel(
+          `${subject}${course}-${section}`,
+          0,
+          {
+            parentID: parent,
+            permissionOverwrites: generateOverwrites(role.id)
+          }
+        )
+        await r.lpush('class.list', role.id)
+        await r.set(`class:${role.id}`, JSON.stringify({
+          channel: channel.id,
+          subject,
+          course,
+          section,
+          title,
+          instructor
+        }))
+        response.push(`Added ${role.mention}`)
+      }
+    } catch (err) {
+      response.push('Invalid CSV provided.')
     }
     await msg.channel.createMessage(response.join('\n'))
   }, {
     description: 'Add classes in bulk from a CSV file',
+    fullDescription: 'Required fields are `COURSE_SUBJ_CODE,COURSE_COURSE_CODE,COURSE_SECTION_NUMBER,COURSE_TITLE,COURSE_INSTRUCTOR`',
     requirements: moderatorOptions,
     guildOnly: true
   })
