@@ -273,6 +273,61 @@ export const init = (bot: CommandClient): void => {
     requirements: moderatorOptions,
     guildOnly: true
   })
+
+  bot.registerCommand('registersubject', async (msg, args) => {
+    if (args[0] === undefined) {
+      await msg.channel.createMessage('Please provide a subject code.')
+      return
+    }
+    const subjectCode = args.shift().toUpperCase()
+    // Allows subjects like STAT to share a role with MATH
+    const subjectAliases = args.map(s => s.toUpperCase())
+
+    const subjectRegistered = await r.get(`subject:${subjectCode}`)
+    if (subjectRegistered !== null) {
+      await msg.channel.createMessage('Role already registered for provided subject.')
+      return
+    }
+
+    const aliasRegistered = await r.get(`subject.alias:${subjectCode}`)
+    if (aliasRegistered !== null) {
+      await msg.channel.createMessage('Alias already registered for provided subject.')
+      return
+    }
+
+    const { guild } = msg.channel as TextChannel
+    const role = await guild.createRole({
+      name: subjectCode,
+      permissions: 0
+    })
+
+    await r.set(`subject:${subjectCode}`, role.id)
+
+    const response = ['Successfully created subject role.']
+
+    await Promise.all(subjectAliases.map(async alias => {
+      const subjectRegistered = await r.get(`subject:${alias}`)
+      if (subjectRegistered !== null) {
+        response.push(`${alias} already registered as subject.`)
+        return
+      }
+
+      const aliasRegistered = await r.get(`subject.alias:${alias}`)
+      if (aliasRegistered !== null) {
+        response.push(`${alias} already registered as alias.`)
+        return
+      }
+
+      await r.set(`subject.alias:${alias}`, subjectCode)
+    }))
+
+    await msg.channel.createMessage(response.join('\n'))
+  }, {
+    description: 'Create a role for a role for a subject.',
+    fullDescription: 'Users who join a course in this subject will automatically be given the created role.',
+    requirements: moderatorOptions,
+    guildOnly: true
+  })
 }
 
 export default {
