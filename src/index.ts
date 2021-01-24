@@ -10,6 +10,7 @@ import bot from './config/bot'
 import commands from './commands'
 import { r } from './config/redis'
 import routes from './routes'
+import events from './events'
 
 const web = express()
 // Lets us consume JSON POSTs
@@ -45,6 +46,9 @@ const server = web.listen(80)
 
 // Load all our commands
 commands.init(bot)
+
+// Load all our events
+events.init(bot)
 
 // Connect to Discord
 bot.connect()
