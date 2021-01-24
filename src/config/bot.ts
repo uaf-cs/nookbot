@@ -4,7 +4,8 @@ const bot = new CommandClient(process.env.DISCORD_TOKEN, {
   intents: [
     'guilds',
     'guildMembers',
-    'guildMessages'
+    'guildMessages',
+    'guildVoiceStates'
   ],
   getAllUsers: true
 }, {
