@@ -49,7 +49,7 @@ const generateOverwrites = (role: string): Array<{
       type: 'role',
       allow: 139264,
       deny: 0
-    }
+    },
     // {
     //   // Muted, allow none, deny send messages
     //   id: process.env.CS_MUTED,
