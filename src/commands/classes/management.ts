@@ -43,6 +43,13 @@ const generateOverwrites = (role: string): Array<{
       allow: 139264,
       deny: 0
     },
+    {
+      // Teaching assistants, same as Teachers
+      id: process.env.CS_TEACHING_ASSISTANT,
+      type: 'role',
+      allow: 139264,
+      deny: 0
+    }
     // {
     //   // Muted, allow none, deny send messages
     //   id: process.env.CS_MUTED,

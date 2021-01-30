@@ -10,9 +10,11 @@ services:
       # IDs for the guild and roles
       CS_GUILD:
       CS_ADMIN:
+      CS_APPROVED:
       CS_STUDENT:
       CS_ALUMNUS:
       CS_TEACHER:
+      CS_TEACHING_ASSISTANT:
 
       # Discord application information
       DISCORD_CLIENT_ID:
