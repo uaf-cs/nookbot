@@ -27,7 +27,7 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: frontend
+          context: .
           push: true
           tags: |
             ghcr.io/uaf-cs/nookbot-backend:latest
