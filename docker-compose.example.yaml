@@ -25,6 +25,9 @@ services:
       GOOGLE_CLIENT_ID:
       GOOGLE_CLIENT_SECRET:
 
+      # Wolfram|Alpha application information
+      WOLFRAM_KEY:
+
       REDIS_URL: redis://redis/
       SESSION_SECRET:
     ports:
