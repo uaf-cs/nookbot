@@ -1,5 +1,5 @@
 import parse from 'csv-parse/lib/sync'
-import { CommandClient, TextChannel, Message } from 'eris'
+import { CommandClient, TextChannel, Message, Role } from 'eris'
 
 import { r } from '../../config/redis'
 import { RedisClass } from '../../custom'
@@ -75,38 +75,47 @@ export const init = (bot: CommandClient): void => {
       return
     }
     await msg.channel.sendTyping()
-    const response: string[] = []
+    const responses: string[] = []
     const courseCSV = msg.content.slice(msg.content.indexOf('\n'))
+    let courseList: CsvCourse[]
     try {
-      const courseList: CsvCourse[] = parse(courseCSV, {
+      courseList = parse(courseCSV, {
         columns: true
       })
-      for (const c of courseList) {
-        // Make sure all required keys are present
-        const requiredKeys = [
-          'COURSE_SUBJ_CODE',
-          'COURSE_COURSE_CODE',
-          'COURSE_SECTION_NUMBER',
-          'COURSE_TITLE',
-          'COURSE_INSTRUCTOR'
-        ]
-        if (!requiredKeys.every(k => Object.keys(c).includes(k))) {
-          response.push('Course is missing required keys')
-          continue
-        }
+    } catch (err) {
+      await msg.channel.createMessage('Invalid CSV provided.')
+      return
+    }
 
-        const {
-          COURSE_SUBJ_CODE: subject,
-          COURSE_COURSE_CODE: course,
-          COURSE_SECTION_NUMBER: section,
-          COURSE_TITLE: title,
-          COURSE_INSTRUCTOR: instructor
-        } = c
-        const role = await guild.createRole({
+    for (const c of courseList) {
+      // Make sure all required keys are present
+      const requiredKeys = [
+        'COURSE_SUBJ_CODE',
+        'COURSE_COURSE_CODE',
+        'COURSE_SECTION_NUMBER',
+        'COURSE_TITLE',
+        'COURSE_INSTRUCTOR'
+      ]
+      if (!requiredKeys.every(k => Object.keys(c).includes(k))) {
+        responses.push('Course is missing required keys')
+        continue
+      }
+
+      const {
+        COURSE_SUBJ_CODE: subject,
+        COURSE_COURSE_CODE: course,
+        COURSE_SECTION_NUMBER: section,
+        COURSE_TITLE: title,
+        COURSE_INSTRUCTOR: instructor
+      } = c
+      let role: Role
+      let channel: TextChannel
+      try {
+        role = await guild.createRole({
           name: `${subject}${course} - ${section} ${instructor}`,
           permissions: 0
         })
-        const channel = await guild.createChannel(
+        channel = await guild.createChannel(
           `${subject}${course}-${section}`,
           0,
           {
@@ -123,12 +132,33 @@ export const init = (bot: CommandClient): void => {
           title,
           instructor
         }))
-        response.push(`Added ${role.mention}`)
+        responses.push(`Added ${role.mention}`)
+      } catch (err) {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        responses.push(`Error adding ${subject}${course}-${section}: ${err}`)
+        if (role !== undefined) {
+          await r.lrem('class.list', 0, role.id)
+          await r.del(`class:${role.id}`)
+          await role.delete('Error cleanup')
+        }
+        if (channel !== undefined) {
+          await channel.delete()
+        }
       }
-    } catch (err) {
-      response.push('Invalid CSV provided.')
     }
-    await msg.channel.createMessage(response.join('\n'))
+    // Split response into multiple messages
+    // Due to the amount of data returned by this command, it is likely to
+    // exceed the 2000 character limit for bots.
+    let replyString = ''
+    for (const response of responses) {
+      if (replyString.length + response.length > 2000) {
+        await msg.channel.createMessage(replyString)
+        replyString = response + '\n'
+      } else {
+        replyString += response + '\n'
+      }
+    }
+    await msg.channel.createMessage(replyString)
   }, {
     description: 'Add classes in bulk from a CSV file',
     fullDescription: 'Required fields are `COURSE_SUBJ_CODE,COURSE_COURSE_CODE,COURSE_SECTION_NUMBER,COURSE_TITLE,COURSE_INSTRUCTOR`',
