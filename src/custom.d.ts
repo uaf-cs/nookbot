@@ -4,17 +4,20 @@ import { Profile as GoogleProfile } from 'passport-google-oauth'
 
 declare global {
   namespace Express {
-    export interface Session {
-      inGuild: boolean
-      updatedNickname: boolean
-      classes: string[]
-      subjects: string[]
-      status: 'student' | 'alumnus' | 'teacher'
-    }
     export interface User {
       google: GoogleProfile
       discord: DiscordProfile
     }
+  }
+}
+
+declare module 'express-session' {
+  interface SessionData {
+    inGuild: boolean
+    updatedNickname: boolean
+    classes: string[]
+    subjects: string[]
+    status: 'student' | 'alumnus' | 'teacher'
   }
 }
 

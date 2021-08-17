@@ -60,7 +60,6 @@ router.get('/', (req, res) => {
   }
   // Get rid of things we don't need to be there
   delete resp.cookie
-  delete resp.passport
   res.json({
     ...req.user,
     ...resp
