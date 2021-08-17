@@ -14,7 +14,7 @@ interface CsvCourse {
 }
 
 const moderatorOptions = {
-  custom: (msg: Message) => {
+  custom: (msg: Message<TextChannel>) => {
     return msg.member.roles.find(r => [
       process.env.CS_TEACHER,
       process.env.CS_ADMIN
@@ -108,8 +108,8 @@ export const init = (bot: CommandClient): void => {
         COURSE_TITLE: title,
         COURSE_INSTRUCTOR: instructor
       } = c
-      let role: Role
-      let channel: TextChannel
+      let role: Role | null = null
+      let channel: TextChannel | null = null
       try {
         role = await guild.createRole({
           name: `${subject}${course} - ${section} ${instructor}`,
@@ -136,12 +136,12 @@ export const init = (bot: CommandClient): void => {
       } catch (err) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         responses.push(`Error adding ${subject}${course}-${section}: ${err}`)
-        if (role !== undefined) {
+        if (role !== null) {
           await r.lrem('class.list', 0, role.id)
           await r.del(`class:${role.id}`)
           await role.delete('Error cleanup')
         }
-        if (channel !== undefined) {
+        if (channel !== null) {
           await channel.delete()
         }
       }
@@ -171,7 +171,7 @@ export const init = (bot: CommandClient): void => {
     const classes = await r.lrange('class.list', 0, -1)
     const { guild } = msg.channel as TextChannel
     const classPromises = classes.map(async c => {
-      const classJson = await r.get(`class:${c}`)
+      const classJson = await r.get(`class:${c}`) as string
       const classChannelId = JSON.parse(classJson).channel as string
       const classChannel = guild.channels.get(classChannelId)
       if (classChannel !== undefined) {
@@ -194,7 +194,7 @@ export const init = (bot: CommandClient): void => {
       await msg.channel.createMessage('Invalid usage.')
       return
     }
-    const [to, from] = await Promise.all(args.map(async id => JSON.parse(await r.get(`class:${id}`)) as RedisClass))
+    const [to, from] = await Promise.all(args.map(async id => JSON.parse(await r.get(`class:${id}`) as string) as RedisClass))
     const [toId, fromId] = args
     if (to === null) {
       await msg.channel.createMessage(`Class ${toId} not found`)
@@ -221,12 +221,12 @@ export const init = (bot: CommandClient): void => {
         await m.addRole(toId, 'Class migration')
       }
     }))
-    const classJson = await r.get(`class:${fromId}`)
+    const classJson = await r.get(`class:${fromId}`) as string
     const fromClass = JSON.parse(classJson) as RedisClass
     try {
       await Promise.all([
         guild.deleteRole(fromId),
-        guild.channels.get(fromClass.channel).delete(),
+        (guild.channels.get(fromClass.channel) as TextChannel).delete(),
         r.lrem('class.list', 0, fromId),
         r.del(`class:${fromId}`)
       ])
@@ -242,7 +242,7 @@ export const init = (bot: CommandClient): void => {
 
   bot.registerCommand('deleteclass', async (msg, args) => {
     const [classId] = args
-    const classMetadata = JSON.parse(await r.get(`class:${classId}`)) as RedisClass
+    const classMetadata = JSON.parse(await r.get(`class:${classId}`) as string) as RedisClass
     if (classMetadata === null) {
       await msg.channel.createMessage('Class not found')
       return
@@ -262,7 +262,7 @@ export const init = (bot: CommandClient): void => {
     try {
       await Promise.all([
         guild.deleteRole(classId),
-        guild.channels.get(classMetadata.channel).delete(),
+        (guild.channels.get(classMetadata.channel) as TextChannel).delete(),
         r.lrem('class.list', 0, classId),
         r.del(`class:${classId}`)
       ])
@@ -276,7 +276,7 @@ export const init = (bot: CommandClient): void => {
 
   bot.registerCommand('cleanup', async msg => {
     const courseIDs = await r.lrange('class.list', 0, -1)
-    const promiseDetails = courseIDs.map(async c => ({ id: c, raw: await r.get(`class:${c}`) }))
+    const promiseDetails = courseIDs.map(async c => ({ id: c, raw: await r.get(`class:${c}`) as string }))
     const details = await Promise.all(promiseDetails)
     const courses = details.map(c => ({ id: c.id, ...JSON.parse(c.raw) as RedisClass }))
 
@@ -298,7 +298,7 @@ export const init = (bot: CommandClient): void => {
       try {
         await Promise.all([
           guild.deleteRole(c.id),
-          guild.channels.get(c.channel).delete(),
+          (guild.channels.get(c.channel) as TextChannel).delete(),
           r.lrem('class.list', 0, c.id),
           r.del(`class:${c.id}`)
         ])

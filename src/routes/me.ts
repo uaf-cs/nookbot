@@ -1,3 +1,4 @@
+import { Member } from 'eris'
 import { Router } from 'express'
 
 import bot from '../config/bot'
@@ -8,7 +9,11 @@ const router = Router()
 router.use(async (req, res, next) => {
   if (req.isAuthenticated() && req.user.google !== undefined && req.user.discord !== undefined) {
     // Update member session
-    const member = bot.guilds.get(process.env.CS_GUILD).members.get(req.user.discord.id)
+    const guild = bot.guilds.get(process.env.CS_GUILD)
+    if (guild === undefined) {
+      return res.status(500).end()
+    }
+    const member = guild.members.get(req.user.discord.id)
     if (member === undefined) {
       req.session.inGuild = false
       req.session.updatedNickname = false
@@ -55,7 +60,7 @@ router.use(async (req, res, next) => {
 })
 
 router.get('/', (req, res) => {
-  const resp = {
+  const resp: any = {
     ...req.session
   }
   // Get rid of things we don't need to be there
@@ -67,6 +72,9 @@ router.get('/', (req, res) => {
 })
 
 router.post('/status', async (req, res) => {
+  if (req.user === undefined) {
+    return res.status(401).end()
+  }
   const { status } = req.body as { status: string }
   switch (status) {
     case 'student':
@@ -110,7 +118,17 @@ router.post('/status', async (req, res) => {
 })
 
 router.post('/courses/:id', async (req, res) => {
-  const member = bot.guilds.get(process.env.CS_GUILD).members.get(req.user.discord.id)
+  if (req.user === undefined) {
+    return res.status(401).end()
+  }
+
+  const guild = bot.guilds.get(process.env.CS_GUILD)
+  if (guild === undefined) {
+    return res.status(500).end()
+  }
+  // Disabled on next line as we already know that the user is in the guild
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  const member = guild.members.get(req.user.discord.id) as Member
 
   if (member.roles.filter(
     role =>
@@ -141,6 +159,9 @@ router.post('/courses/:id', async (req, res) => {
 })
 
 router.delete('/courses/:id', async (req, res) => {
+  if (req.user === undefined) {
+    return res.status(401).end()
+  }
   const courseExists = await r.exists(`class:${req.params.id}`)
   if (courseExists === 0) {
     res.status(404)
@@ -158,7 +179,17 @@ router.delete('/courses/:id', async (req, res) => {
 })
 
 router.post('/subjects/:id', async (req, res) => {
-  const member = bot.guilds.get(process.env.CS_GUILD).members.get(req.user.discord.id)
+  if (req.user === undefined) {
+    return res.status(401).end()
+  }
+
+  const guild = bot.guilds.get(process.env.CS_GUILD)
+  if (guild === undefined) {
+    return res.status(500).end()
+  }
+  // Disabled on next line as we already know that the user is in the guild
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  const member = guild.members.get(req.user.discord.id) as Member
 
   if (member.roles.filter(
     role =>
@@ -189,6 +220,9 @@ router.post('/subjects/:id', async (req, res) => {
 })
 
 router.delete('/subjects/:id', async (req, res) => {
+  if (req.user === undefined) {
+    return res.status(401).end()
+  }
   const subjectExists = await r.exists(`subject:${req.params.id}`)
   if (subjectExists === 0) {
     res.status(404)

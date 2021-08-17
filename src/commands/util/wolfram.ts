@@ -45,12 +45,12 @@ export const init = (bot: CommandClient): void => {
       }
       const embed: Embed = {
         color: 0x31ada9,
-        fields: [],
         footer: {
           text: 'Results provided by Wolfram|Alpha'
         },
         type: 'rich'
       }
+      embed.fields = []
       for (const pod of data.pods) {
         if (pod.subpods[0] !== undefined) {
           const subpod = pod.subpods[0]

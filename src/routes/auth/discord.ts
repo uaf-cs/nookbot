@@ -34,8 +34,15 @@ router.get('/', passport.authenticate('discord'))
 router.get('/callback', passport.authenticate('discord', {
   failureRedirect: 'error'
 }), async (req, res) => {
+  if (req.user === undefined) {
+    return res.status(401).end()
+  }
   // Update member usernames
-  const member = bot.guilds.get(process.env.CS_GUILD).members.get(req.user.discord.id)
+  const guild = bot.guilds.get(process.env.CS_GUILD)
+  if (guild === undefined) {
+    return res.status(500).end()
+  }
+  const member = guild.members.get(req.user.discord.id)
   if (member === undefined) {
     req.session.inGuild = false
   } else {

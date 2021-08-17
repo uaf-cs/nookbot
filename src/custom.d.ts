@@ -9,6 +9,26 @@ declare global {
       discord: DiscordProfile
     }
   }
+  namespace NodeJS {
+    interface ProcessEnv {
+      API_ROOT: string
+      CS_GUILD: string
+      CS_ADMIN: string
+      CS_APPROVED: string
+      CS_STUDENT: string
+      CS_ALUMNUS: string
+      CS_TEACHER: string
+      CS_TEACHING_ASSISTANT: string
+      DISCORD_CLIENT_ID: string
+      DISCORD_CLIENT_SECRET: string
+      DISCORD_TOKEN: string
+      GOOGLE_CLIENT_ID: string
+      GOOGLE_CLIENT_SECRET: string
+      WOLFRAM_KEY: string
+      REDIS_URL: string
+      SESSION_SECRET: string
+    }
+  }
 }
 
 declare module 'express-session' {

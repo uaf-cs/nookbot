@@ -63,14 +63,13 @@ export const init = (bot: CommandClient): void => {
   })
 
   bot.registerCommand('hotdog', async msg => {
-    const embed: EmbedOptions = {
-      image: {
-        url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Hotdog_-_Evan_Swigart.jpg/1200px-Hotdog_-_Evan_Swigart.jpg'
-      }
+    const embed: EmbedOptions = {}
+    embed.image = {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Hotdog_-_Evan_Swigart.jpg/1200px-Hotdog_-_Evan_Swigart.jpg'
     }
 
     // Give Cam's favourite hotdog a chance to show up.
-    if (Math.floor(Math.random() * 2) === 1) {
+    if (Math.floor(Math.random() * 5) === 1) {
       try {
         const hotdog = await fetch('https://source.unsplash.com/featured/?hotdog', {
           method: 'HEAD'

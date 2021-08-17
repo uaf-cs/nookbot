@@ -10,9 +10,18 @@ function deleteOffice (channel: VoiceChannel): void {
 export const init = (bot: CommandClient): void => {
   bot.on('voiceChannelJoin', async (member: Member, channel: VoiceChannel) => {
     if (channel.name.startsWith('Join to create an office')) {
-      bot.createChannel(channel.guild.id, `${member.nick}'s office`, 2, { parentID: channel.parentID }).then((newChannel: VoiceChannel) => {
-        member.edit({ channelID: newChannel.id }).catch((err: any) => console.log(err))
-      }).catch((err: any) => console.log(err))
+      bot.createChannel(
+        channel.guild.id,
+        `${member.nick ?? member.username}'s office`,
+        2,
+        {
+          parentID: channel.parentID as string
+        }
+      )
+        .then((newChannel: VoiceChannel) => {
+          member.edit({ channelID: newChannel.id }).catch((err: any) => console.log(err))
+        })
+        .catch((err: any) => console.log(err))
     }
   })
   bot.on('voiceChannelLeave', (member: Member, channel: VoiceChannel) => {

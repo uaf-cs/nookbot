@@ -5,7 +5,7 @@ const router = Router()
 
 router.get('/', async (req, res) => {
   const courses = await r.lrange('class.list', 0, -1)
-  const promiseDetails = courses.map(async c => ({ id: c, raw: await r.get(`class:${c}`) }))
+  const promiseDetails = courses.map(async c => ({ id: c, raw: await r.get(`class:${c}`) as string }))
   const details = await Promise.all(promiseDetails)
 
   const subjectIds = await r.lrange('subject.list', 0, -1)

@@ -21,7 +21,7 @@ export const init = (bot: CommandClient): void => {
       toEval = toEval.substring(0, toEval.length - 3).trim()
     }
     const startTime = new Date()
-    let res: string
+    let res = ''
     let errored = false
     try {
       // eslint-disable-next-line no-eval
