@@ -23,8 +23,10 @@ passport.use(new Strategy({
       },
       body: JSON.stringify({ access_token: accessToken })
     })
-    const resJson = await res.json()
-    console.log(res.status, resJson)
+    if (!res.ok) {
+      const resJson = await res.json()
+      console.log('Could not add user to guild!', res.status, resJson.message)
+    }
     done(null, { ...req.user, discord: profile })
   }
 }))
