@@ -15,7 +15,7 @@ passport.use(new Strategy({
   if (req.user?.google === undefined) {
     done(Error('must link google'))
   } else {
-    await fetch(`https://discord.com/api/guilds/${process.env.CS_GUILD}/members/${profile.id}`, {
+    const res = await fetch(`https://discord.com/api/guilds/${process.env.CS_GUILD}/members/${profile.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -23,6 +23,8 @@ passport.use(new Strategy({
       },
       body: JSON.stringify({ access_token: accessToken })
     })
+    const resJson = await res.json()
+    console.log(res.status, resJson)
     done(null, { ...req.user, discord: profile })
   }
 }))
