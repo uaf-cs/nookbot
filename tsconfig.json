@@ -10,7 +10,8 @@
     "lib": [
       "es2020"
     ],
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*"
