@@ -76,14 +76,14 @@ export const init = (bot: CommandClient): void => {
     }
     await msg.channel.sendTyping()
     const responses: string[] = []
-    const courseCSV = msg.content.slice(msg.content.indexOf('\n'))
+    const courseCSV = msg.content.slice(msg.content.indexOf('\n')).trim()
     let courseList: CsvCourse[]
     try {
       courseList = parse(courseCSV, {
         columns: true
       })
     } catch (err) {
-      await msg.channel.createMessage('Invalid CSV provided.')
+      await msg.channel.createMessage('Invalid CSV provided.\n' + err)
       return
     }
 
