@@ -10,7 +10,7 @@ router.use('/google', google)
 
 router.get('/login', (req, res) => {
   req.logout(err => {
-    if (err !== null) {
+    if (err != null) {
       throw err
     }
     res.redirect('google')
@@ -19,7 +19,7 @@ router.get('/login', (req, res) => {
 
 router.get('/logout', (req, res) => {
   req.logout(err => {
-    if (err !== null) {
+    if (err != null) {
       throw err
     }
     res.redirect('/')
