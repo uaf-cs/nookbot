@@ -1,5 +1,5 @@
 import parse from 'csv-parse/lib/sync'
-import { CommandClient, TextChannel, Message, Role } from 'eris'
+import { CommandClient, TextChannel, Message, Role, Overwrite, Constants } from 'eris'
 
 import { r } from '../../config/redis'
 import { RedisClass } from '../../custom'
@@ -22,45 +22,40 @@ const moderatorOptions = {
   }
 }
 
-const generateOverwrites = (role: string): Array<{
-  id: string
-  type: 'role'|'member'
-  allow: number
-  deny: number
-}> => {
+const generateOverwrites = (role: string): Overwrite[] => {
   return [
     {
       // @everyone, allow none, deny read messages.
       id: process.env.CS_GUILD,
-      type: 'role',
+      type: Constants.PermissionOverwriteTypes.ROLE,
       allow: 0,
       deny: 1024
     },
     {
       // Teachers, allow mention everyone and manage messages, deny none
       id: process.env.CS_TEACHER,
-      type: 'role',
+      type: Constants.PermissionOverwriteTypes.ROLE,
       allow: 139264,
       deny: 0
     },
     {
       // Teaching assistants, same as Teachers
       id: process.env.CS_TEACHING_ASSISTANT,
-      type: 'role',
+      type: Constants.PermissionOverwriteTypes.ROLE,
       allow: 139264,
       deny: 0
     },
     // {
     //   // Muted, allow none, deny send messages
     //   id: process.env.CS_MUTED,
-    //   type: 'role',
+    //   type: Constants.PermissionOverwriteTypes.ROLE,
     //   allow: 0,
     //   deny: 2048
     // },
     {
       // Class role, allow read messages, deny none
       id: role,
-      type: 'role',
+      type: Constants.PermissionOverwriteTypes.ROLE,
       allow: 1024,
       deny: 0
     }
@@ -118,6 +113,7 @@ export const init = (bot: CommandClient): void => {
         channel = await guild.createChannel(
           `${subject}${course}-${section}`,
           0,
+          undefined,
           {
             parentID: parent,
             permissionOverwrites: generateOverwrites(role.id)
