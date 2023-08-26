@@ -19,6 +19,7 @@ declare global {
       CS_ALUMNUS: string
       CS_TEACHER: string
       CS_TEACHING_ASSISTANT: string
+      CS_ADMIN_UTILITY: string
       DISCORD_CLIENT_ID: string
       DISCORD_CLIENT_SECRET: string
       DISCORD_TOKEN: string
