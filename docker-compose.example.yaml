@@ -15,6 +15,7 @@ services:
       CS_ALUMNUS:
       CS_TEACHER:
       CS_TEACHING_ASSISTANT:
+      CS_ADMIN_UTILITY:
 
       # Discord application information
       DISCORD_CLIENT_ID:

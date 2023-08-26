@@ -58,6 +58,13 @@ const generateOverwrites = (role: string): Overwrite[] => {
       type: Constants.PermissionOverwriteTypes.ROLE,
       allow: 1024,
       deny: 0
+    },
+    {
+      // Admin utility role, allow read messages, deny none
+      id: process.env.CS_ADMIN_UTILITY,
+      type: Constants.PermissionOverwriteTypes.ROLE,
+      allow: 1024,
+      deny: 0
     }
   ]
 }
