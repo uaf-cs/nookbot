@@ -6,6 +6,7 @@ services:
     environment:
       # The root URL that the API will be served on
       API_ROOT:
+      FRONTEND_ROOT:
 
       # IDs for the guild and roles
       CS_GUILD:

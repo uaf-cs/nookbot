@@ -12,6 +12,7 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       API_ROOT: string
+      FRONTEND_ROOT: string
       CS_GUILD: string
       CS_ADMIN: string
       CS_APPROVED: string

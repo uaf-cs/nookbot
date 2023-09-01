@@ -8,10 +8,10 @@ export const init = (bot: CommandClient): void => {
   // Redirect to the website for joining classes
   bot.registerCommand(
     'joinclass',
-    'Class registration has been moved to https://nookbot.katlyn.dev/. Please use the website to join classes and gain access to their channels.',
+    `Class registration has been moved to ${process.env.FRONTEND_ROOT}. Please use the website to join classes and gain access to their channels.`,
     {
       aliases: ['join'],
-      description: 'Join classes with https://nookbot.katlyn.dev/'
+      description: `Join classes with ${process.env.FRONTEND_ROOT}`
     }
   )
 }
