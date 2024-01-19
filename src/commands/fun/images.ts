@@ -4,13 +4,13 @@ import fetch from 'node-fetch'
 export const init = (bot: CommandClient): void => {
   bot.registerCommand('cat', async msg => {
     try {
-      const req = await fetch('https://aws.random.cat/meow')
+      const req = await fetch('https://cataas.com/cat?json=true')
       if (req.ok) {
         const randomKitty = await req.json()
         await msg.channel.createMessage({
           embed: {
             image: {
-              url: randomKitty.file
+              url: `https://cataas.com/cat/${randomKitty._id}`
             }
           }
         })
