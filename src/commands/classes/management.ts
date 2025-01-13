@@ -8,7 +8,6 @@ import { getReply } from '../../config/bot'
 interface CsvCourse {
   COURSE_SUBJ_CODE: string
   COURSE_COURSE_CODE: string
-  COURSE_SECTION_NUMBER: string
   COURSE_TITLE: string
   COURSE_INSTRUCTOR: string
 }
@@ -85,7 +84,8 @@ export const init = (bot: CommandClient): void => {
         columns: true
       })
     } catch (err) {
-      await msg.channel.createMessage('Invalid CSV provided.\n' + err)
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      await msg.channel.createMessage(`Invalid CSV provided.\n${err}`)
       return
     }
 
@@ -94,7 +94,6 @@ export const init = (bot: CommandClient): void => {
       const requiredKeys = [
         'COURSE_SUBJ_CODE',
         'COURSE_COURSE_CODE',
-        'COURSE_SECTION_NUMBER',
         'COURSE_TITLE',
         'COURSE_INSTRUCTOR'
       ]
@@ -106,7 +105,6 @@ export const init = (bot: CommandClient): void => {
       const {
         COURSE_SUBJ_CODE: subject,
         COURSE_COURSE_CODE: course,
-        COURSE_SECTION_NUMBER: section,
         COURSE_TITLE: title,
         COURSE_INSTRUCTOR: instructor
       } = c
@@ -114,13 +112,12 @@ export const init = (bot: CommandClient): void => {
       let channel: TextChannel | null = null
       try {
         role = await guild.createRole({
-          name: `${subject}${course} - ${section} ${instructor}`,
+          name: `${subject}${course} - ${instructor}`,
           permissions: 0
         })
         channel = await guild.createChannel(
-          `${subject}${course}-${section}`,
+          `${subject}${course}`,
           0,
-          undefined,
           {
             parentID: parent,
             permissionOverwrites: generateOverwrites(role.id)
@@ -131,24 +128,24 @@ export const init = (bot: CommandClient): void => {
           channel: channel.id,
           subject,
           course,
-          section,
           title,
           instructor
         }))
         responses.push(`Added ${role.mention}`)
       } catch (err) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        responses.push(`Error adding ${subject}${course}-${section}: ${err}`)
+        responses.push(`Error adding ${subject}${course}: ${err}`)
         if (role !== null) {
           await r.lrem('class.list', 0, role.id)
           await r.del(`class:${role.id}`)
-          await role.delete('Error cleanup')
+          await role.delete('Error cleaning up')
         }
         if (channel !== null) {
           await channel.delete()
         }
       }
     }
+
     // Split response into multiple messages
     // Due to the amount of data returned by this command, it is likely to
     // exceed the 2000 character limit for bots.
